@@ -18,7 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: fontist/setup-fontist@v2
-      - run: fontist manifest-install manifest.yml
+        with:
+          manifest: manifest.yml
       - uses: typst-community/setup-typst@v3
         id: setup-typst
       - name: Build PDF
