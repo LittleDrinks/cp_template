@@ -1,0 +1,25 @@
+using ull = unsigned long long;
+const ull msk = chrono::steady_clock::now().time_since_epoch().count();
+
+// ull h(ull x) { return x * x * x * 1237123 + 19260817; }
+// ull f(ull x) { return h(x & ((1 << 31) - 1)) + h(x >> 31); }
+ull shift(ull x)
+{
+    x ^= msk;
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+    x ^= msk;
+    return x;
+}
+
+ull has[N];
+void getHash(int u, int fa) 
+{
+    has[u] = 1;
+    for (auto v: G[u]) {
+        if (v == fa) { continue; }
+        getHash(v, u);
+        has[u] += shift(has[v]);
+    }
+}

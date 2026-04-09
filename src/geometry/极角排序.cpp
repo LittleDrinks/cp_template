@@ -1,17 +1,37 @@
-// 极角排序  (-1,0)方向作为结尾的逆时针序
-struct argcmp {
-  bool operator()(const Point &a, const Point &b) const {
-    const auto quad = [](const Point &a) {
-      if (a.y < -eps) return 1;
-      if (a.y > eps) return 4;
-      if (a.x < -eps) return 5;
-      if (a.x > eps) return 3;
-      return 2;
+// 直接计算极角
+atan2(y, x);            // atan2(n, m) 表示以 m 为极轴，m 转向 n 为正方向
+fmod(2*PI+ang(), 2*PI)  // 极角归一化
+
+// 所有点都在一个半平面内
+bool argcmp(Point a, Point b) { return sgn(a^b) > 0; }
+
+// 全平面极角排序
+// 把全平面划分为：下半平面 < 原点 < x 正半轴 < 上半平面 < x 负半轴
+bool argcmp(Point a, Point b) {
+    auto quad = [](const Point &a) {
+		if (a.y < 0)       { return 1; }
+        else if (a.y > 0)  { return 3; }
+        else if (a.x >= 0) { return 2; }
+        else               { return 4; }
     };
-    const int qa = quad(a), qb = quad(b);
-    if (qa != qb) return qa < qb;
-    const auto t = a ^ b;
-    // if (abs(t)<=eps) return a*a<b*b-eps;  // 不同长度的向量需要分开
-    return t > eps;
-  }
-};
+    int qa = quad(a), qb = quad(b);
+	if (qa == qb) {
+	    ll cross = a^b;
+	    if (cross == 0) { return a*a < b*b; }
+	    return cross > 0;
+	}
+	return qa < qb;
+}
+
+// 用结构体实现 argcmp，方便在 STL 中使用
+struct argcmp {
+	bool operator()(const Point &a, const Point &b) const {
+		// ...
+	}
+}
+
+// STL 中使用 argcmp()，不要忘记传入 &argcmp 作为初始化变量
+// 如果 argcmp() 使用 lambda 实现，类型应该为 decltype(argcmp)
+set<Point,decltype(&argcmp)> evt{&argcmp};
+map<Point,pair<ll,ll>,decltype(&argcmp)> evt{&argcmp};
+priority_queue<Point,vector<Point>,decltype(&argcmp)> q{&argcmp};

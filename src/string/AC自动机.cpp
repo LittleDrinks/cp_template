@@ -1,53 +1,119 @@
-const int maxn = 1e6 + 10;
-int n; char c[maxn];
-struct AC {
-  int trie[maxn][26], tot;
-  int e[maxn], fail[maxn], old[maxn];
-  void init() {
-    memset(trie, 0, sizeof(trie));
-    memset(e, 0, sizeof(e));
-    memset(fail, 0, sizeof(fail));
-    memset(old, 0, sizeof(old));
-    tot = 0;
-  }
-  void insert(char *t) {
-    int x = 0;
-    for (int i = 1; t[i]; i++) {
-      if (!trie[x][t[i] - 'a']) {
-        trie[x][t[i] - 'a'] = ++tot;
-      }
-      x = trie[x][t[i] - 'a'];
+struct AhoCorasick {
+    static constexpr int ALPHABET = 26;
+    struct Node {
+        int len;
+        int link;
+        array<int,ALPHABET> next;
+        Node(): len{0}, link{0}, next{} { }
+    };
+
+    vector<Node> t;
+
+    AhoCorasick() {
+        init();
     }
-    e[x]++;
-  }
-  queue<int> qu;
-  void build() {
-    for (int i = 0; i < 26; i++) {
-      if (trie[0][i]) qu.push(trie[0][i]);
+
+    void init() {
+        t.assign(2, Node());
+        t[0].next.fill(1);
+        t[0].len = -1;
     }
-    while (!qu.empty()) {
-      int x = qu.front();
-      qu.pop();
-      for (int i = 0; i < 26; i++) {
-        if (trie[x][i]) {
-          fail[trie[x][i]] = trie[fail[x]][i];
-          qu.push(trie[x][i]);
-        } else {
-          trie[x][i] = trie[fail[x]][i];
+
+    int newNode() {
+        t.emplace_back();
+        return t.size() - 1;
+    }
+
+    int add(const string &a) {
+        int p = 1;
+        for (auto c: a) {
+            int x = c - 'a';
+            if (t[p].next[x] == 0) {
+                t[p].next[x] = newNode();
+                t[t[p].next[x]].len = t[p].len + 1;
+            }
+            p = t[p].next[x];
         }
-        old[trie[x][i]] = e[fail[trie[x][i]]] ? fail[trie[x][i]] : old[fail[trie[x][i]]];
-      }
+        return p;
     }
-  }
-  int query(char * t) {  // 这里是统计有多少模板串出现在了文本串之中，所以统计到了就要变成-1
-    int x = 0, res = 0;
-    for (int i = 1; t[i]; i++) {
-      x = trie[x][t[i] - 'a'];
-      for (int j = x; j && e[j] != -1; j = old[j]) {
-        res += e[j]; e[j] = -1;
-      }
+
+    void work() {
+        queue<int> q;
+        q.push(1);
+
+        while (!q.empty()) {
+            int x = q.front();
+            q.pop();
+
+            for (int i = 0; i < ALPHABET; ++i) {
+                if (t[x].next[i] == 0) {
+                    t[x].next[i] = t[t[x].link].next[i];
+                } else {
+                    t[t[x].next[i]].link = t[t[x].link].next[i];
+                    q.push(t[x].next[i]);
+                }
+            }
+        }
     }
-    return res;
-  }
+
+    int next(int p, int x) {
+        return t[p].next[x];
+    }
+
+    int link(int p) {
+        return t[p].link;
+    }
+
+    int len(int p) {
+        return t[p].len;
+    }
+
+    int size() {
+        return t.size();
+    }
 };
-AC ac;
+
+constexpr int N = 2e6+5;
+vector<int> G[N];
+int cnt[N];
+
+void dfs(int u) 
+{
+    for (auto v: G[u]) {
+        dfs(v);
+        cnt[u] += cnt[v];
+    }
+}
+
+void solve()
+{
+	int n;
+	cin >> n;
+
+    AhoCorasick AC;
+    vector<int> pos(n + 1);
+    for (int i = 1; i <= n; ++i) {
+        string s;
+        cin >> s;
+        pos[i] = AC.add(s);
+    }
+    AC.work();
+
+    string T;
+    cin >> T;
+    int p = 1;
+    for (int i = 0; i < int(T.size()); ++i) {
+        int x = T[i] - 'a';
+        p = AC.next(p, x);
+        ++cnt[p];
+    }
+
+    for (int i = 1; i < AC.size(); ++i) {
+        G[AC.link(i)].push_back(i);
+    }
+    dfs(1);
+
+    for (int i = 1; i <= n; ++i) {
+        cout << cnt[pos[i]] << "\n";
+    }
+}

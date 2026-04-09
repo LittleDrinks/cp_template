@@ -1,0 +1,11 @@
+typedef long long ll;//很可能long long也会爆，要开__int128
+ll CRT(vector<ll> &r, vector<ll> &a) {
+    ll n = 1, ans = 0, k = a.size();
+    for (auto x : r) n = n * x;
+    for (int i = 0; i < k; i++) {
+        ll m = n / r[i], R, y;
+        Exgcd(m, r[i], R, y);  // 见扩欧模版
+        ans = (ans + a[i] * m * R % n) % n;
+    }
+    return (ans % n + n) % n;
+}

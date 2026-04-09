@@ -1,0 +1,1 @@
+ll Cat(ll n) { return C(2*n, n) * qpow(n+1) % MOD; }

@@ -1,0 +1,4 @@
+auto start = chrono::high_resolution_clock::now();
+auto stop = chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+if (duration > 998) { cout << ans << "\n"; exit(0); }

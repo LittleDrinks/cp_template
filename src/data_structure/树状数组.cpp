@@ -1,0 +1,25 @@
+struct BIT {
+    int n;
+    vector<int> t;
+    BIT(int n): n(n), t(n+1) { }  // 注意值域树状数组中 n = tot
+    int lowbit(int x) { return x&-x; }
+    void modify(int x, int d) {
+        for (; x <= n; x += lowbit(x)) { t[x] += d; }
+    }
+    int query(int x) {
+        int res = 0;
+        for (; x; x -= lowbit(x)) { res += t[x]; }
+        return res;
+    }
+    // 求最小的前缀和等于 x 的位置
+	int select(int x) {
+	    int ans = 0, sum = 0;
+	    for (int i = __lg(n); i >= 0; --i) {
+	        if (ans+(1<<i) <= n && sum+t[ans+(1<<i)] < x) {
+	            ans += 1<<i;
+	            sum += t[ans];
+	        }
+	    }
+	    return ans + 1;
+	}
+};

@@ -1,17 +1,23 @@
-const int maxn = 2e5 + 10;
-vector<int> ve[maxn];
-int a[maxn]; int n;
-int build() {
-  int top = 0;
-  vector<int> Stack(n + 1, 0);
-  for (int i = 0; i <= n; i++) {
-    ve[i].clear(); ve[i].resize(2, -1);
-  }
-  Stack[++top] = 1;
-  for (int i = 2; i <= n; i++) {
-    while (top && a[Stack[top]] >= a[i]) top--;
-    if (!top) ve[i][0] = Stack[top + 1];
-    else ve[i][0] = ve[Stack[top]][1], ve[Stack[top]][1] = i;
-    Stack[++top] = i;
-  } return Stack[1];
+vector<int> stk;
+vector<int> L(n+1), R(n+1);
+for (int i = 1; i <= n; ++i) {
+	int flag = 0;
+	while (!stk.empty()) {
+		if (a[stk.back()] > a[i]) {  // 小根堆
+			flag = stk.back(); stk.pop_back();
+		} else {
+			break;
+		}
+	}
+	if (flag) { L[i] = flag; }
+	if (!stk.empty()) { R[stk.back()] = i; }
+	stk.push_back(i);
 }
+function<void(int)> dfs = [&](int x){
+	cerr << "now node " << x << "\n";
+	cerr << ":: L = " << L[x] << "\n";
+	cerr << ":: R = " << R[x] << "\n";
+	if (L[x]) dfs(L[x]);
+	if (R[x]) dfs(R[x]);
+};
+dfs(stk[0]);
