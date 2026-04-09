@@ -21,3 +21,11 @@
 - 安装 VSCode 插件 `tinymist`:
   - 打开 VSCode
   - 搜索 `tinymist` 安装插件
+
+- 编译 PDF:
+
+  ```bash
+  typst compile main.typ main.pdf --font-path ~/.fontist/fonts
+  ```
+
+- 若中文显示为方块（乱码），请先安装 CJK 字体（例如 `Noto Serif CJK SC` / `Noto Sans CJK SC` / `Noto Sans Mono CJK SC`），再重新编译。
