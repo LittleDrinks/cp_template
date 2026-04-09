@@ -4,36 +4,36 @@
 #import "@preview/zebraw:0.5.5": *
 #let fonts = (
   serif: (
-    "Libertinus Serif",
-    "Times New Roman",
+    "Noto Serif CJK SC",
     "Source Han Serif SC",
     "Source Han Serif",
-    "Noto Serif CJK SC",
     "SimSun",
     "Songti SC",
     "STSongti",
+    "Libertinus Serif",
+    "Times New Roman",
   ),
   sans-serif: (
-    "Libertinus Sans",
-    "Arial",
+    "Noto Sans CJK SC",
     "Source Han Sans SC",
     "Source Han Sans",
-    "Noto Sans CJK SC",
     "SimHei",
     "Heiti SC",
     "STHeiti",
+    "Libertinus Sans",
+    "Arial",
   ),
   monospace: (
+    "Noto Sans Mono CJK SC",
+    "Source Han Sans HW SC",
+    "Source Han Sans HW",
+    "SimHei",
+    "Heiti SC",
+    "STHeiti",
     "DejaVu Sans Mono",
     "Courier New",
     "Menlo",
     "IBM Plex Mono",
-    "Source Han Sans HW SC",
-    "Source Han Sans HW",
-    "Noto Sans Mono CJK SC",
-    "SimHei",
-    "Heiti SC",
-    "STHeiti",
   ),
 )
 
@@ -49,10 +49,10 @@
   body,
 ) = {
   set document(author: authors, title: title)
-  set text(font: fonts.serif, lang: "zh", region: "cn")
+  set text(font: fonts.serif, lang: "zh", region: "cn", fallback: true)
 
   show math.equation: set text(weight: 400)
-  show raw: set text(font: fonts.monospace, lang: "zh", region: "cn")
+  show raw: set text(font: fonts.monospace, lang: "zh", region: "cn", fallback: true)
 
   show: zebraw-init.with(fast-preview: preview)
   show: zebraw.with(
@@ -122,4 +122,3 @@
   }
   raw(read(path).trim(), lang: lang, block: true, ..args)
 }
-
