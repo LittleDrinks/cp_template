@@ -25,6 +25,12 @@
 - 编译 PDF:
 
   ```bash
+  typst compile main.typ main.pdf
+  ```
+
+- 若你使用了 `fontist` 安装字体（与 CI 一致），可以指定字体目录：
+
+  ```bash
   typst compile main.typ main.pdf --font-path ~/.fontist/fonts
   ```
 
