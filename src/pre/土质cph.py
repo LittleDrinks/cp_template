@@ -1,33 +1,25 @@
-from os import listdir as l, system as e
-from os.path import join as j
-from sys import argv
-import subprocess as s
+import sys, argparse, subprocess as s
+from pathlib import Path
 
-q,f = argv[1:3]
-tid = argv[3] if len(argv)>3 else None
+G, R, P, N = '\033[32m', '\033[31m', '\033[35m', '\033[0m'
 
-if "py" in f:
-    cmd = ["python3", f]
-else:
-    e(f"g++ -std=gnu++20 -O2 -Wall {f}.cpp -o {f}")
-    cmd = j(".", f)
+p = argparse.ArgumentParser()
+p.add_argument('q')
+p.add_argument('f', nargs='?')
+ag = p.parse_args()
 
-d='samples-'+q.capitalize()
-g,r,p,n='\033[32m','\033[31m','\033[35m','\033[0m'
-for i in l(d):
-    if ("in" not in i) or (tid and i != tid + ".in"):
-        continue
-    t = j(d, i[:-2])
-    print(i,end=' ',flush=1)
+q: str = ag.q
+f = ag.f or q
+cmd = [sys.executable, 'run.py', f]
+for i in Path(f'samples-{q.capitalize()}').glob('*.in'):
+    print(i, end=' ', flush=1)
+    o = i.with_suffix('.out')
+    a = i.with_suffix('.ans')
     try:
-        k = s.run(cmd, timeout=2, stdin=open(f"{t}in"), 
-                 stdout=open(f"{t}out", 'w'), stderr=s.PIPE, text=1)
-        # c = lambda o,a : all(abs(float(x)-float(y))/max(1,abs(float(y)))<=1e-4 
-        #               for x,y in zip(o.read().split(),a.read().split()))
-        o = open(f"{t}out").read().split()
-        a = open(f"{t}ans").read().split()
-        print(f"{g}AC{n}" if o == a else f"{r}WA{n}")
-        if k.stderr:print(f'{r}{k.stderr}{n}')
+        k = s.run(cmd, timeout=2, input=i.read_text(), stdout=s.PIPE, stderr=s.PIPE, text=1)
+        o.write_text(k.stdout)
+        print(f'{G}AC{N}' if k.stdout.rstrip() == a.read_text().rstrip() else f'{R}WA{N}')
+        if k.stderr: print(f'{R}{k.stderr}{N}')
     except s.TimeoutExpired as k:
-        print(f'{p}TLE or RE{n}')
-        if k.stderr: print(f'{r}{k.stderr}{n}')
+        print(f'{P}TLE or RE{N}')
+        if k.stderr: print(f'{R}{k.stderr}{N}')

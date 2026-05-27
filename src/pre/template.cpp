@@ -13,7 +13,6 @@ template<typename T> ostream& operator<<(ostream& os, const vector<T>& v) {
 template<typename T> void gmax(T&x,T y){ x = max(x, y); }
 template<typename T> void gmin(T&x,T y){ x = min(x, y); }
 
-int main()
-{
+int main() {
     ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
 }

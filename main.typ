@@ -18,12 +18,14 @@
 = 赛前准备
 == template
 #import_code("src/pre/template.cpp")
+== run.py
+#import_code("src/pre/run.py")
 == 土质 cph
 #import_code("src/pre/土质cph.py")
 == 随机数
 #import_code("src/pre/随机数.cpp")
 == 对拍
-#import_code("src/pre/对拍.sh")
+#import_code("src/pre/check.py")
 
 
 = 杂项
@@ -111,6 +113,8 @@
 #import_code("src/graph/树的直径与中心.cpp")
 == 点分治与树的重心
 #import_code("src/graph/点分治与树的重心.cpp")
+== 树链剖分
+#import_code("src/graph/树链剖分.cpp")
 == DSU on tree
 #import_code("src/graph/DSU on tree.cpp")
 == 树哈希
@@ -131,6 +135,8 @@
 #import_code("src/graph/最大流.cpp")
 
 = 数学
+== 常用公式速查
+#include "src/math/常用公式速查.typ"
 == 卡特兰数
 #import_code("src/math/卡特兰数.cpp")
 == 因数
@@ -195,3 +201,6 @@
 #import_code("src/dp/单调队列优化.cpp")
 == SOSDP
 #import_code("src/dp/SOSDP.cpp")
+
+= 烂掉啦
+#include "src/fuck/fuck.typ"
