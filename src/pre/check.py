@@ -1,21 +1,30 @@
-import sys, subprocess as s
+import sys
+import subprocess as s
+from os import system as e
 from pathlib import Path
 
-def run(f, i=None, o=None):
-    r = s.run([sys.executable, 'run.py', f], input=i, capture_output=1, text=1).stdout
-    if o: Path(0).write_text(r)
-    return r
+def build(p: Path):
+    if p.suffix == '.py':
+        return [sys.executable, str(p)]
+    else:
+        cpp = p.with_suffix('.cpp')
+        exe = p.with_suffix('.exe')
+        e(f'g++ -std=gnu++20 {cpp} -o {exe}')
+        return [str(exe.resolve())]
 
-G = 'a_gen'
-B = 'a_bf'
-M = 'a'
-
+q = 'k'
+G = build(Path(q+'_gen'))
+B = build(Path(q+'_bf'))
+M = build(Path(q))
+i = '.in'
+o = '.out'
+a = '.ans'
 while 1:
-    t = run(G, o='.in')
-    o = run(B, t, '.out')
-    a = run(M, t, '.ans')
-    if o != a:
+    s.run(G, stdout=open(i,'w'))
+    s.run(B, stdin=open(i), stdout=open(o,'w'))
+    s.run(M, stdin=open(i), stdout=open(a,'w'))
+    if open(o).read().split() == open(a).read().split():
+        print('AC')
+    else:
         print('WA')
         break
-    else:
-        print('AC')
