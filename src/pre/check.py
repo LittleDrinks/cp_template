@@ -21,8 +21,8 @@ o = '.out'
 a = '.ans'
 while 1:
     s.run(G, stdout=open(i,'w'))
-    s.run(B, stdin=open(i), stdout=open(o,'w'))
-    s.run(M, stdin=open(i), stdout=open(a,'w'))
+    s.run(B, stdin=open(i), stdout=open(a,'w'))
+    s.run(M, stdin=open(i), stdout=open(o,'w'))
     if open(o).read().split() == open(a).read().split():
         print('AC')
     else:

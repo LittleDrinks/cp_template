@@ -1,6 +1,5 @@
 struct Line {
-    Point a, b;
-    Vector v;
+    Point a, b, v;
 	Line(Point a, Point b): a(a), b(b) { v = b - a; }
 	int toLeft(Point p) { return sgn(v^(p-a)); }
     // 判断点 p 是否在线段 AB 上
