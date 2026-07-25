@@ -4,10 +4,10 @@
   title: "算法模板",
   team: "LittleDrinks",
   school: "Shanghai University",
-  authors: ("Chen Shijie",),
+  authors: ("Shijie Chen",),
   logo: "头像.jpg",
   header: [
-    _Chen Shijie \@ Shanghai University_#h(1fr)#context counter(page).display("1 / 1", both: true)
+    _Shijie Chen \@ Shanghai University_#h(1fr)#context counter(page).display("1 / 1", both: true)
   ],
   preview: sys.inputs.at("x-preview", default: none) != none,
   commit: sys.inputs.at("x-git-commit", default: none),

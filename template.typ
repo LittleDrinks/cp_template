@@ -3,37 +3,12 @@
 // Go ahead and customize it to your liking!
 #import "@preview/zebraw:0.5.5": *
 #let fonts = (
-  serif: (
-    "Noto Serif CJK SC",
-    "Source Han Serif SC",
-    "Source Han Serif",
-    "SimSun",
-    "Songti SC",
-    "STSongti",
-    "Libertinus Serif",
-    "Times New Roman",
-  ),
-  sans-serif: (
+  text: (
     "Noto Sans CJK SC",
-    "Source Han Sans SC",
-    "Source Han Sans",
-    "SimHei",
-    "Heiti SC",
-    "STHeiti",
-    "Libertinus Sans",
-    "Arial",
   ),
   monospace: (
-    "Noto Sans Mono CJK SC",
-    "Source Han Sans HW SC",
-    "Source Han Sans HW",
-    "SimHei",
-    "Heiti SC",
-    "STHeiti",
     "DejaVu Sans Mono",
-    "Courier New",
-    "Menlo",
-    "IBM Plex Mono",
+    "Noto Sans Mono CJK SC",
   ),
 )
 
@@ -49,7 +24,7 @@
   body,
 ) = {
   set document(author: authors, title: title)
-  set text(font: fonts.serif, lang: "zh", region: "cn", fallback: true)
+  set text(font: fonts.text, lang: "zh", region: "cn", fallback: true)
 
   show math.equation: set text(weight: 400)
   show raw: set text(font: fonts.monospace, lang: "zh", region: "cn", fallback: true)
