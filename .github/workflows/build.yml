@@ -17,13 +17,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: fontist/setup-fontist@v2
-        with:
-          manifest: manifest.yml
+      - name: Install CJK fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
       - uses: typst-community/setup-typst@v3
         id: setup-typst
+      - name: Verify CJK fonts
+        run: |
+          typst fonts --font-path /usr/share/fonts/opentype/noto > /tmp/typst-fonts.txt
+          grep -Fx 'Noto Serif CJK SC' /tmp/typst-fonts.txt
+          grep -Fx 'Noto Sans CJK SC' /tmp/typst-fonts.txt
+          grep -Fx 'Noto Sans Mono CJK SC' /tmp/typst-fonts.txt
       - name: Build PDF
-        run: typst compile main.typ main.pdf --font-path ~/.fontist/fonts --input x-git-commit=$(git rev-parse --short HEAD)
+        run: typst compile main.typ main.pdf --font-path /usr/share/fonts/opentype/noto --input x-git-commit=$(git rev-parse --short HEAD)
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
