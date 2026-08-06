@@ -61,20 +61,20 @@ bool inConvex(const vector<Point> &conv, Point p) {
 // 求 p[i]，使得 cross(dir(p[i]), p[j]-p[i]) <= 0 对所有 j 均成立
 // 复杂度 O(logn)
 template<typename F>
-size_t extreme(const vector<Point> &p, const F& dir) {
+size_t extreme(const vector<Point>& p, const F& dir) {
     int n = p.size();
-    const auto check = [&](const size_t i) {
-        return dir(p[i]).toLeft(p[(i+1)%n]-p[i]) >= 0;
+    const auto check = [&](size_t i) {
+        return (dir(p[i]) ^ (p[(i + 1) % n] - p[i])) >= 0;
     };
     const auto dir0 = dir(p[0]);
     const auto check0 = check(0);
-    if (!check(0) && check(p.back())) return 0;
-    const auto cmp = [&](const Point &v) {
+    if (!check0 && check(n - 1)) return 0;
+    const auto cmp = [&](const Point& v) -> bool {
         const size_t vi = &v - p.data();
-        if (vi == 0) return 1;
+        if (vi == 0) return true;
         const auto checkv = check(vi);
-        const auto t = dir0.toLeft(v - p[0]);
-        if (vi == 1 && checkv == check0 && t == 0) return 1;
+        const auto t = dir0 ^ (v - p[0]);
+        if (vi == 1 && checkv == check0 && t == 0) return true;
         return checkv ^ (checkv == check0 && t <= 0);
     };
     return partition_point(p.begin(), p.end(), cmp) - p.begin();
