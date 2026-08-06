@@ -57,3 +57,40 @@ bool inConvex(const vector<Point> &conv, Point p) {
 	if (abs(cnt) == conv.size()) { return true; }
 	else { return false; }
 }
+// 凸多边形关于某一方向的极点
+// 求 p[i]，使得 cross(dir(p[i]), p[j]-p[i]) <= 0 对所有 j 均成立
+// 复杂度 O(logn)
+template<typename F>
+size_t extreme(const vector<Point> &p, const F& dir) {
+    int n = p.size();
+    const auto check = [&](const size_t i) {
+        return dir(p[i]).toLeft(p[(i+1)%n]-p[i]) >= 0;
+    };
+    const auto dir0 = dir(p[0]);
+    const auto check0 = check(0);
+    if (!check(0) && check(p.back())) return 0;
+    const auto cmp = [&](const Point &v) {
+        const size_t vi = &v - p.data();
+        if (vi == 0) return 1;
+        const auto checkv = check(vi);
+        const auto t = dir0.toLeft(v - p[0]);
+        if (vi == 1 && checkv == check0 && t == 0) return 1;
+        return checkv ^ (checkv == check0 && t <= 0);
+    };
+    return partition_point(p.begin(), p.end(), cmp) - p.begin();
+}
+// 过凸多边形外一点求凸多边形的切线，返回切点下标
+// 复杂度 O(logn)
+// 必须保证点在多边形外
+pair<size_t, size_t> tangent(const vector<Point> &p, const Point &a) {
+    const size_t i = extreme(p, [&](const Point &u){return u - a; });
+    const size_t j = extreme(p, [&](const Point &u){return a - u; });
+    return {i, j};
+}
+// 求平行于给定直线的凸多边形的切线，返回切点下标
+// 复杂度 O(logn)
+pair<size_t, size_t> tangent(const vector<Point> &p, const Line &a) {
+    const size_t i = extreme(p, [&](...){ return a.v; });
+    const size_t j = extreme(p, [&](...){ return -a.v; });
+    return {i, j};
+}
