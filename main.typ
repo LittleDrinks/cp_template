@@ -185,6 +185,8 @@
 = 字符串
 == 前缀函数与KMP
 #import_code("src/string/前缀函数与KMP.cpp")
+== 扩展KMP
+#import_code("src/string/扩展KMP.cpp")
 == Manacher
 #import_code("src/string/Manacher.cpp")
 == 字符串哈希
