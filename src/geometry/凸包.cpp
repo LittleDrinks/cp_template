@@ -1,7 +1,7 @@
 // 求平面点集的凸包，conv[0]是最左下角的点，逆时针顺序
 // Andrew 算法，时间复杂度 O(nlogn)
 vector<Point> toConvex(vector<Point> po) {
-	if (po.empty()) { return {}; }
+	if (po.size() <= 1) { return po; }
 	sort(po.begin(), po.end());
     vector<Point> conv;
 	auto check = [&](Point u){
@@ -77,7 +77,8 @@ size_t extreme(const vector<Point>& p, const F& dir) {
         if (vi == 1 && checkv == check0 && t == 0) return true;
         return checkv ^ (checkv == check0 && t <= 0);
     };
-    return partition_point(p.begin(), p.end(), cmp) - p.begin();
+    return min(n-1, partition_point(p.begin(), p.end(), cmp) - p.begin());
+	// 通过取 min 特判掉 n<=2 的情况
 }
 // 过凸多边形外一点求凸多边形的切线，返回切点下标
 // 复杂度 O(logn)

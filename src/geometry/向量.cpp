@@ -12,6 +12,7 @@ struct Point {
 	db ang() { return atan2(y, x); }
 	bool operator== (const Point &p) const { return sgn(x-p.x)==0 && sgn(y-p.y)==0; }
 	bool operator< (const Point &p) const { return x<p.x || (x==p.x && y<p.y); }
+	Point operator- () const { return Point(-x, -y); }
 	Point operator+ (const Point &p) const { return Point(x+p.x, y+p.y); }
 	Point operator- (const Point &p) const { return Point(x-p.x, y-p.y); }
 	Point operator* (const T &k) const { return Point(k*x, k*y); }
