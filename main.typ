@@ -92,6 +92,8 @@
 #import_code("src/data_structure/手写bitset.cpp")
 == 莫队
 #import_code("src/data_structure/莫队.cpp")
+== LCT
+#import_code("src/data_structure/LCT.cpp")
 
 = 图论
 == bitset优化传递闭包
