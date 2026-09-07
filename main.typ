@@ -92,6 +92,8 @@
 #import_code("src/data_structure/手写bitset.cpp")
 == 莫队
 #import_code("src/data_structure/莫队.cpp")
+== CDQ分治
+#import_code("src/data_structure/cdq.cpp")
 == LCT
 #import_code("src/data_structure/LCT.cpp")
 
