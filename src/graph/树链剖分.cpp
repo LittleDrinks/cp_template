@@ -71,7 +71,7 @@ struct HLD {
             lca = v;
             F(in[v], in[u]+1, true);
         } else {
-            lca = v;
+            lca = u;
             R.emplace_back(in[u], in[v]+1);
         }
         reverse(R.begin(), R.end());
