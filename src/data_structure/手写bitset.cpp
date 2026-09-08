@@ -1,127 +1,108 @@
+using u64 = uint64_t;
+using u128 = __uint128_t;
+u64 rev64(u64 x) {
+    x = ((x>>1 )&0x5555555555555555ULL) | ((x&0x5555555555555555ULL)<<1);
+    x = ((x>>2 )&0x3333333333333333ULL) | ((x&0x3333333333333333ULL)<<2);
+    x = ((x>>4 )&0x0f0f0f0f0f0f0f0fULL) | ((x&0x0f0f0f0f0f0f0f0fULL)<<4);
+    x = ((x>>8 )&0x00ff00ff00ff00ffULL) | ((x&0x00ff00ff00ff00ffULL)<<8);
+    x = ((x>>16)&0x0000ffff0000ffffULL) | ((x&0x0000ffff0000ffffULL)<<16);
+    return (x>>32) | (x<<32);
+}
+u64 lowmask(int k) {
+    return k==64? ~0ULL: (k? (1ULL<<k)-1: 0); 
+}
 struct FastBitset {
-    using u64 = uint64_t;
-    int n;
+    int n, B;
     vector<u64> a;
-
-    FastBitset(int n = 0): n(n), a((n + 63) >> 6) { }
-
-    static u64 mask(int len) {
-        return len == 64 ? ~0ULL : (1ULL << len) - 1;
+    FastBitset(int n): n(n), B((n+63)>>6), a(B) {}
+    u64 read64(int p) const {
+        if (p >= n || p <= -64) return 0;
+        if (p < 0) return read64(0) << (-p);
+        int b = p>>6, o = p&63;
+        u64 x = a[b]>>o;
+        if (o && b+1<B) x |= a[b+1]<<(64-o);
+        return x & lowmask(min(64, n-p));
     }
-
-    void set(int p) { a[p >> 6] |= 1ULL << (p & 63); }
-    void reset(int p) { a[p >> 6] &= ~(1ULL << (p & 63)); }
-    bool test(int p) const { return (a[p >> 6] >> (p & 63)) & 1; }
-
+    void write64(int p, u64 x, int len=64) {
+        if (p < 0 || p >= n || len <= 0) return;
+        len = min({len, 64, n-p});
+        int b = p>>6;
+        int o = p&63;
+        int t = min(len, 64-o);
+        u64 m = lowmask(t) << o;
+        a[b] = (a[b]&~m) | ((x<<o)&m);
+        if (t < len) {
+            u64 m = lowmask(len-t);
+            a[b+1] = (a[b+1]&~m) | ((x>>t)&m);
+        }
+    }
+    void trim() { if (!a.empty() && (n&63)) a.back() &= lowmask(n&63); }
+    void set(int p) { write64(p,1,1); }
+    void reset(int p) { write64(p,0,1); }
+    bool test(int p) const { return read64(p)&1; }
     void modify(int l, int r, bool v) {
-        if (l > r) return;
-        int bl = l >> 6, br = r >> 6;
-        int lo = l & 63, ro = r & 63;
-
-        if (bl == br) {
-            u64 m = mask(ro - lo + 1) << lo;
-            v ? a[bl] |= m : a[bl] &= ~m;
-        }
-        else {
-            u64 lm = mask(64 - lo) << lo;
-            u64 rm = mask(ro + 1);
-            v ? a[bl] |= lm : a[bl] &= ~lm;
-            v ? a[br] |= rm : a[br] &= ~rm;
-            fill(a.begin() + bl + 1, a.begin() + br, (v ? ~0ULL : 0));
+        for (int p = l; p <= r; p += 64) {
+            int len = min(64, r-p+1);
+            write64(p, (v?lowmask(len): 0), len);
         }
     }
-
     FastBitset& operator&= (const FastBitset &o) {
-        size_t siz = min(a.size(), o.a.size());
-        for (size_t i = 0; i < siz; ++i)
-            a[i] &= o.a[i];
+        assert(n == o.n);
+        for (int i = 0; i < B; ++i) a[i]&=o.a[i];
         return *this;
     }
-    FastBitset operator& (const FastBitset &o) {
-        FastBitset res(*this);
-        res &= o;
-        return res;
-    }
-
     FastBitset& operator|= (const FastBitset &o) {
-        size_t siz = min(a.size(), o.a.size());
-        for (size_t i = 0; i < siz; ++i)
-            a[i] |= o.a[i];
+        assert(n == o.n);
+        for (int i = 0; i < B; ++i) a[i]|=o.a[i];
         return *this;
     }
-    FastBitset operator| (const FastBitset &o) {
-        FastBitset res(*this);
-        res |= o;
-        return res;
-    }
-
-    FastBitset& operator^=(const FastBitset &o) {
-        size_t siz = min(a.size(), o.a.size());
-        for (size_t i = 0; i < siz; ++i) a[i] ^= o.a[i];
+    FastBitset& operator^= (const FastBitset &o) {
+        assert(n == o.n);
+        for (int i = 0; i < B; ++i) a[i]^=o.a[i];
         return *this;
     }
-    FastBitset operator^(const FastBitset &o) const {
-        FastBitset res(*this); res ^= o; return res;
-    }
-
-    bool any() const { for (u64 x : a) if (x) return true; return false; }
-    bool none() const { return !any(); }
-
-    int count() const {
-        int c = 0;
-        for (u64 x: a) c += std::popcount(x);
-        return c;
-    }
-
-    // 提取 [l,r]，复杂度 O((r-l)/64)
+    friend FastBitset operator& (FastBitset x, const FastBitset &y) { return x&=y; }
+    friend FastBitset operator| (FastBitset x, const FastBitset &y) { return x|=y; }
+    friend FastBitset operator^ (FastBitset x, const FastBitset &y) { return x^=y; }
     FastBitset slice(int l, int r) const {
-        FastBitset res(r - l + 1);
-        int bl = l >> 6, br = r >> 6, lo = l & 63, len = r - l + 1;
-        if (bl == br) { res.a[0] = (a[bl] >> lo) & mask(len); return res; }
-        if (lo == 0) { // 对齐直接拷贝
-            for (int i = bl, j = 0; i <= br; ++i) res.a[j++] = a[i];
-        } else { // 跨块拼接：当前块右部 + 下一块左部
-            int j = 0;
-            u64 cur = a[bl] >> lo;
-            for (int i = bl; i < br; ++i) {
-                u64 nxt = a[i + 1];
-                res.a[j++] = cur | (nxt << ((-lo) & 63));  // (-lo)&63 == 64-lo
-                cur = nxt >> lo;
-            }
-            res.a[j] = cur;
+        FastBitset res(r-l+1);
+        for (int i = 0; i < res.B; ++i) {
+            res.a[i] = read64(l+(i<<6));
         }
-        if (int rem = len & 63) res.a.back() &= mask(rem);
+        res.trim();
         return res;
     }
-
-    // 左移 k 位，复杂度 O(n/64)
-    FastBitset& operator<<=(int k) {
+    FastBitset& operator<<= (int k) {
         if (k <= 0) return *this;
         if (k >= n) { fill(a.begin(), a.end(), 0); return *this; }
-        int b = k >> 6, o = k & 63, sz = a.size();
-        for (int i = sz - 1; i >= 0; --i) {
-            u64 v = (i - b >= 0) ? a[i - b] << o : 0;
-            if (o && i - b - 1 >= 0) v |= a[i - b - 1] >> ((-o) & 63);
-            a[i] = v;
+        for (int i = B-1; i >= 0; --i) {
+            a[i] = read64((i<<6)-k);
         }
-        fill(a.begin(), a.begin() + b, 0);
-        if (int rem = n & 63) a.back() &= mask(rem);
+        trim();
         return *this;
     }
-    FastBitset operator<<(int k) const { FastBitset r(*this); r <<= k; return r; }
-
-    // 右移 k 位，复杂度 O(n/64)
-    FastBitset& operator>>=(int k) {
+    FastBitset& operator>>= (int k) {
         if (k <= 0) return *this;
         if (k >= n) { fill(a.begin(), a.end(), 0); return *this; }
-        int b = k >> 6, o = k & 63, sz = a.size();
-        for (int i = 0; i < sz; ++i) {
-            u64 v = (i + b < sz) ? a[i + b] >> o : 0;
-            if (o && i + b + 1 < sz) v |= a[i + b + 1] << ((-o) & 63);
-            a[i] = v;
-        }
-        fill(a.end() - b, a.end(), 0);
+        for (int i = 0; i < B; ++i) {
+            a[i] = read64((i<<6)+k);
+        } 
+        trim();
         return *this;
     }
-    FastBitset operator>>(int k) const { FastBitset r(*this); r >>= k; return r; }
+    friend FastBitset operator<< (FastBitset x, int k) { return x<<=k; }
+    friend FastBitset operator>> (FastBitset x, int k) { return x>>=k; }
+
+    FastBitset& rev() {
+        reverse(a.begin(), a.end());
+        for (auto &x: a) x = rev64(x);
+        int s = (64-(n&63))&63;
+        if (s) {
+            for (int i = 0; i < B; ++i) {
+                a[i] = (a[i]>>s) | (i+1<B? a[i+1]<<(64-s): 0); 
+            }
+        }
+        trim();
+        return *this;
+    }
 };
