@@ -29,6 +29,7 @@ jobs:
           grep -Fx 'Libertinus Serif' /tmp/typst-fonts.txt
           grep -Fx 'DejaVu Sans Mono' /tmp/typst-fonts.txt
           grep -Fx 'Noto Serif CJK SC' /tmp/typst-fonts.txt
+          grep -Fx 'Noto Sans CJK SC' /tmp/typst-fonts.txt
           grep -Fx 'Noto Sans Mono CJK SC' /tmp/typst-fonts.txt
       - name: Build PDF
         run: typst compile main.typ main.pdf --font-path /usr/share/fonts/opentype/noto --input x-git-commit=$(git rev-parse --short HEAD)
