@@ -3,12 +3,37 @@
 // Go ahead and customize it to your liking!
 #import "@preview/zebraw:0.5.5": *
 #let fonts = (
-  text: (
+  serif: (
+    "Libertinus Serif",
+    "Times New Roman",
+    "Source Han Serif SC",
+    "Source Han Serif",
+    "Noto Serif CJK SC",
+    "SimSun",
+    "Songti SC",
+    "STSongti",
+  ),
+  sans-serif: (
+    "Libertinus Sans",
+    "Arial",
+    "Source Han Sans SC",
+    "Source Han Sans",
     "Noto Sans CJK SC",
+    "SimHei",
+    "Heiti SC",
+    "STHeiti",
   ),
   monospace: (
     "DejaVu Sans Mono",
+    "Courier New",
+    "Menlo",
+    "IBM Plex Mono",
+    "Source Han Sans HW SC",
+    "Source Han Sans HW",
     "Noto Sans Mono CJK SC",
+    "SimHei",
+    "Heiti SC",
+    "STHeiti",
   ),
 )
 
@@ -24,10 +49,10 @@
   body,
 ) = {
   set document(author: authors, title: title)
-  set text(font: fonts.text, lang: "zh", region: "cn", fallback: true)
+  set text(font: fonts.serif, lang: "zh", region: "cn")
 
   show math.equation: set text(weight: 400)
-  show raw: set text(font: fonts.monospace, lang: "zh", region: "cn", fallback: true)
+  show raw: set text(font: fonts.monospace, lang: "zh", region: "cn")
 
   show: zebraw-init.with(fast-preview: preview)
   show: zebraw.with(
