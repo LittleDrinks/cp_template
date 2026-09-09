@@ -80,7 +80,7 @@
 #import_code("src/data_structure/懒标记线段树.cpp")
 === 可持久化线段树
 #import_code("src/data_structure/可持久化线段树.cpp")
-== 李超树
+=== 李超树
 #import_code("src/data_structure/李超树.cpp")
 === 吉司机线段树
 #import_code("src/data_structure/吉司机线段树.cpp")
