@@ -3,8 +3,10 @@
 // Go ahead and customize it to your liking!
 #import "@preview/zebraw:0.5.5": *
 #let fonts = (
-  text: (
-    "Noto Sans CJK SC",
+  // Match upstream wf-trd's serif body; install the CJK fallback in CI.
+  serif: (
+    "Libertinus Serif",
+    "Noto Serif CJK SC",
   ),
   monospace: (
     "DejaVu Sans Mono",
@@ -24,7 +26,7 @@
   body,
 ) = {
   set document(author: authors, title: title)
-  set text(font: fonts.text, lang: "zh", region: "cn", fallback: true)
+  set text(font: fonts.serif, lang: "zh", region: "cn", fallback: true)
 
   show math.equation: set text(weight: 400)
   show raw: set text(font: fonts.monospace, lang: "zh", region: "cn", fallback: true)

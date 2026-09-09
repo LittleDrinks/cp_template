@@ -28,10 +28,14 @@
   typst compile main.typ main.pdf
   ```
 
-- 若你使用了 `fontist` 安装字体（与 CI 一致），可以指定字体目录：
+- 字体与上游 `wf-trd` 保持相同风格：正文使用 `Libertinus Serif`（Typst 自带）和 `Noto Serif CJK SC`（中文宋体）；代码使用 `DejaVu Sans Mono` 和 `Noto Sans Mono CJK SC`。
+
+- Ubuntu / WSL 安装与 CI 相同的字体并编译：
 
   ```bash
-  typst compile main.typ main.pdf --font-path ~/.fontist/fonts
+  sudo apt-get update
+  sudo apt-get install --yes --no-install-recommends fonts-dejavu-core fonts-noto-cjk
+  typst compile main.typ main.pdf --font-path /usr/share/fonts/opentype/noto
   ```
 
-- 若中文显示为方块（乱码），请先安装 CJK 字体（例如 `Noto Serif CJK SC` / `Noto Sans CJK SC` / `Noto Sans Mono CJK SC`），再重新编译。
+- 若中文显示为方块，请用 `typst fonts` 检查上述中文字体是否可见；字体安装在其他目录时，用 `--font-path` 指定该目录。不要通过把正文字体换成黑体来修复缺字。
