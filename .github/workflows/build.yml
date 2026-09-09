@@ -26,7 +26,9 @@ jobs:
       - name: Verify CJK fonts
         run: |
           typst fonts --font-path /usr/share/fonts/opentype/noto > /tmp/typst-fonts.txt
+          grep -Fx 'Libertinus Serif' /tmp/typst-fonts.txt
           grep -Fx 'DejaVu Sans Mono' /tmp/typst-fonts.txt
+          grep -Fx 'Noto Serif CJK SC' /tmp/typst-fonts.txt
           grep -Fx 'Noto Sans CJK SC' /tmp/typst-fonts.txt
           grep -Fx 'Noto Sans Mono CJK SC' /tmp/typst-fonts.txt
       - name: Build PDF
