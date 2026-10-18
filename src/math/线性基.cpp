@@ -1,127 +1,75 @@
+template<class T, int B>
 struct LinearBasis {
-    static const int maxbase = 35;
-    bool flag = false;
-    ll a[maxbase + 1];
-    int tot;
-    LinearBasis() {
-        memset(a, 0, sizeof a);
+    // T 使用有符号数, B < digits 避免 corner case
+    // LinearBasis<ll, 62>
+
+    array<T, B> a{};
+    int tot = 0;
+    bool dependent = false;
+
+    void clear() {
+        a.fill(0);
         tot = 0;
+        dependent = false;
     }
-    LinearBasis(ll *x, int n) {
-        LinearBasis();
-        build(x, n);
-    }
-    void build(ll *x, int n) {
-        for (int i = 1; i <= n; ++i) insert(x[i]);
-    }
-    void clear() { memset(a, 0, sizeof a); }
-    bool insert(ll t) {
-        // 暴力插入一个数，维护的是一个上三角型的线性基矩阵，时间复杂度低，当待插入元素能插入时，返回true
-        for (int i = maxbase; i >= 0; --i) {
-            if (t & (1ll << i)) {
-                if (!a[i]) {
-                    a[i] = t;  // 这里表示插入成功
-                    break;
-                }
-                t ^= a[i];
+    bool insert(T x) {
+        assert(x >= 0 && x < (T(1)<<B));
+        for (int i = B-1; i >= 0; --i) {
+            if (!(x>>i&1)) continue;
+            if (a[i]) {
+                x ^= a[i];
+                continue;
             }
-        }
-        if (t == 0) flag = true, tot++;
-        return t;
-    }
-    bool query(ll t) {
-        // 询问t是否可以被当前线性基表示，不插入
-        if (t > queryMax()) return false;
-        if (t == 0) return true;
-        for (int i = maxbase; i >= 0; --i) {
-            if (t & (1ll << i)) {
-                if (!a[i]) {
-                    return false;
-                }
-                t ^= a[i];
+            for (int j = i-1; j >= 0; --j) {
+                if (a[j] && (x>>j&1)) x ^= a[j];
             }
-        }
-        return true;
-    }
-    void Insert(ll t) {
-        // 插入一个线性基，利用高斯消元法维护一个对角矩阵
-        for (int i = maxbase; i >= 0; --i) {
-            if (t >> i & 1) {
-                if (a[i])
-                    t ^= a[i];
-                else {
-                    a[i] = t;
-                    for (int j = i - 1; j >= 0; --j)
-                        if (a[j] && (a[i] >> j & 1)) a[i] ^= a[j];
-                    for (int j = i + 1; j <= maxbase; ++j)
-                        if (a[j] >> i & 1) a[j] ^= a[i];
-                    break;
-                }
+            for (int j = i+1; j < B; ++j) {
+                if (a[j]>>i&1) a[j] ^= x;
             }
+            a[i] = x;
+            ++tot;
+            return true;
         }
+        dependent = true;
+        return false;
     }
-    LinearBasis merge(const LinearBasis &l1, const LinearBasis &l2) {
-        // 得到两个线性基的并
-        LinearBasis ret = l1;
-        for (int i = maxbase; i >= 0; --i)
-            if (l2.a[i]) ret.insert(l2.a[i]);
-        return ret;
-    }
-    LinearBasis intersection(const LinearBasis &l1, const LinearBasis &l2) {
-        // 得到两个线性基的交
-        LinearBasis all, ret, full;
-        ret.clear();
-        for (int i = maxbase; i >= 0; --i) {
-            all.a[i] = l1.a[i];
-            full.a[i] = 1ll << i;
+    void merge(const LinearBasis &b) {
+        bool dep = b.dependent;
+        for (auto x: b.a) {
+            if (x) insert(x);
         }
-        for (int i = maxbase; i >= 0; --i) {
-            if (l2.a[i]) {
-                ll v = l2.a[i], k = 0;
-                bool flag = true;
-                for (int j = maxbase; j >= 0; --j) {
-                    if (v & (1ll << j)) {
-                        if (all.a[j]) {
-                            v ^= all.a[j];
-                            k ^= full.a[j];
-                        } else {
-                            // l2's basis is not in l1's;
-                            flag = false;
-                            all.a[j] = v;
-                            full.a[j] = k;
-                            break;
-                        }
-                    }
-                }
-                if (flag) {
-                    ll v = 0;  // get intersection by k;
-                    for (int j = maxbase; j >= 0; --j) {
-                        if (k & (1ll << j)) {
-                            v ^= l1.a[j];
-                        }
-                    }
-                    ret.insert(v);
-                }
-            }
+        dependent |= dep;
+    }
+    // 是否能由非空子集异或得到 x
+    bool testNonEmpty(T x) const {
+        T y = x;
+        for (int i = B-1; i >= 0; --i) {
+            if (y>>i&1) y ^= a[i];
         }
-        return ret;
+        return y == 0 && (x != 0 || dependent);
     }
-    // 询问最值
-    ll queryMax() {
-        ll ret = 0;
-        for (int i = maxbase; i >= 0; --i)
-            if ((ret ^ a[i]) > ret) ret ^= a[i];
-        return ret;
+    T queryMax(T x = 0) const {
+        assert(x >= 0);
+        for (int i = B-1; i >= 0; --i) {
+            x = max(x, x^a[i]);
+        }
+        return x;
     }
-    ll queryMin() {
-        for (int i = 0; i <= maxbase; ++i)
-            if (a[i]) return a[i];
-        return 0;
-    }
-    ll Kth_Max(ll k) {
-        ll res = 0;
-        for (int i = 62; i >= 0; i--)
-            if (k & (1LL << i)) res ^= a[i];
+    // 去重，包含 0，0-based 第 k 小
+    T queryKthMin(T k) const {
+        if (k < 0 || k >= (T(1)<<tot)) return -1;
+        T res = 0;
+        int j = 0;
+        for (int i = 0; i < B; ++i) {
+            if (!a[i]) continue;
+            if (k>>j&1) res ^= a[i];
+            ++j;
+        }
         return res;
+    }
+    T queryKthMax(T k) const {
+        T cnt = T(1)<<tot;
+        if (k < 0 || k >= cnt) return -1;
+        return queryKthMin(cnt-k-1);
     }
 };
