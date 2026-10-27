@@ -171,8 +171,10 @@
 #import_code("src/math/Lucas.cpp")
 == 高斯消元
 #import_code("src/math/高斯消元.cpp")
-== 线性基
-#import_code("src/math/线性基.cpp")
+== 异或线性基
+#import_code("src/math/异或线性基.cpp")
+== 向量线性基
+#import_code("src/math/向量线性基.cpp")
 == 矩阵快速幂
 #import_code("src/math/矩阵快速幂.cpp")
 == 自适应辛普森法
